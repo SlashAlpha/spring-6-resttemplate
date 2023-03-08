@@ -8,6 +8,7 @@ import guru.springframework.spring6resttemplate.model.BeerDTOPageImpl;
 import guru.springframework.spring6resttemplate.model.BeerStyle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Headers;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateBuilderConfigurer;
@@ -79,6 +80,7 @@ public class BeerClientMockTest {
 
         server.expect(method(HttpMethod.GET))
                 .andExpect(requestTo(URL + BeerClientImpl.GET_BEER_PATH))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withSuccess(dtoJson, MediaType.APPLICATION_JSON));
 
         Page<BeerDTO> dtos = beerClient.listBeers();
@@ -97,6 +99,7 @@ public class BeerClientMockTest {
     private void mockGetOperation() {
         server.expect(method(HttpMethod.GET))
                 .andExpect(requestToUriTemplate(URL + BeerClientImpl.GET_BEER_BY_ID_PATH,dto.getId()))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withSuccess(dtoJson, MediaType.APPLICATION_JSON));
     }
 
@@ -123,6 +126,7 @@ public class BeerClientMockTest {
 
         server.expect(method(HttpMethod.POST))
                 .andExpect(requestTo(URL+BeerClientImpl.GET_BEER_PATH))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withAccepted().location(uri));
         mockGetOperation();
 
@@ -135,6 +139,7 @@ public class BeerClientMockTest {
     void testUpdateBeer() {
         server.expect(method(HttpMethod.PUT))
                 .andExpect(requestToUriTemplate(URL+BeerClientImpl.GET_BEER_BY_ID_PATH,dto.getId()))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withSuccess());
         mockGetOperation();
         BeerDTO responseBeerDto=beerClient.updateBeer(dto);
@@ -144,6 +149,7 @@ public class BeerClientMockTest {
     void testDeleteNotFound() {
         server.expect(method(HttpMethod.DELETE))
                 .andExpect(requestToUriTemplate(URL+BeerClientImpl.GET_BEER_BY_ID_PATH,dto.getId()))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withResourceNotFound());
         assertThrows(HttpClientErrorException.class,()->{
             beerClient.deleteBeer(dto.getId());
@@ -155,6 +161,7 @@ public class BeerClientMockTest {
     void testDeleteBeer() {
         server.expect(method(HttpMethod.DELETE))
                 .andExpect(requestToUriTemplate(URL+BeerClientImpl.GET_BEER_BY_ID_PATH,dto.getId()))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withNoContent());
        beerClient.deleteBeer(dto.getId());
        server.verify();
@@ -168,6 +175,7 @@ public class BeerClientMockTest {
                 .queryParam("beerName","ALE")
                 .build().toUri();
         server.expect(method(HttpMethod.GET)).andExpect(requestTo(uri))
+                .andExpect(header("Authorization","Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andRespond(withSuccess(dtoJson, MediaType.APPLICATION_JSON));
         Page<BeerDTO> dtos = beerClient.listBeers("ALE",null,null,null,null);
         assertThat(dtos.getContent().size()).isEqualTo(1);
